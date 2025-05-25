@@ -1,8 +1,17 @@
 import { Task } from "@/types";
 
 const DB_NAME = "tiny-sync-db"
+
+// In a production environment, we would retrieve this version remotely.
+// It would be a hash of the DB schema + whatever internal versioning is used on the server.
+// e.g. tiny-sync_{HASH}
+// If the hashes wouldn't match, we'd just create a new database.
 const DB_VERSION = 1;
 
+// Ideally we'd also map the Table names to a hashed schema.
+// On runtime, we'd request a list of tables and their hashes. We'd look that up in our metadata table.
+// If the hash was missing in our IndexedDB, we'd need to refetch the data only for that table.
+// Above assumes we have partial bootstrapping implemented, which we don't. Not sure if this is worth the effort.
 export const STORE = {
     TASKS: "tasks",
     SYNC_QUEUE: "syncQueue"

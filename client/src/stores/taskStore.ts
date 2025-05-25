@@ -15,6 +15,7 @@ export class TaskStore {
   }
   private async init() {
     const persistedTasks = await getTasks();
+    // First bootstrap from IndexedDB
     runInAction(() => {
       for (const task of persistedTasks) {
         this.tasks.set(task.id, task);
@@ -22,6 +23,7 @@ export class TaskStore {
       this.loading = false;
     });
 
+    // Then bootstrap from server
     try {
       const res = await fetch("/api/tasks");
       const serverTasks: Task[] = await res.json();
@@ -34,6 +36,7 @@ export class TaskStore {
         }
 
         // Remove local tasks that no longer exist on server
+        // Even though we tombstone them, API responses aren't supposed to include them, so we can't filter by deleted.
         for (const [id] of this.tasks) {
           if (!serverIds.has(id)) {
             this.tasks.delete(id);
